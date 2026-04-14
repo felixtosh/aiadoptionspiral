@@ -74,6 +74,7 @@ interface State {
   texts: TextArc[];
   yarnW: number;
   font: string;
+  interacted: boolean;
 }
 
 // ── Spiral generation ───────────────────────────────────────
@@ -321,34 +322,36 @@ function draw(
     }
   }
 
-  // hand-drawn arrow pointing at the start
-  const p0 = ps[0];
-  const tipX = p0.x - yarnW / 2 - 4;
-  const tipY = p0.y;
-  const startX = tipX - 60;
-  const startY = tipY - 15;
-  ctx.save();
-  ctx.strokeStyle = "#1e1b2e";
-  ctx.lineWidth = 2.2;
-  ctx.lineCap = "round";
-  ctx.lineJoin = "round";
-  ctx.beginPath();
-  ctx.moveTo(startX, startY);
-  ctx.bezierCurveTo(
-    startX + 20,
-    startY + 14,
-    tipX - 22,
-    tipY - 4,
-    tipX,
-    tipY
-  );
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(tipX - 9, tipY - 7);
-  ctx.lineTo(tipX + 1, tipY);
-  ctx.lineTo(tipX - 7, tipY + 8);
-  ctx.stroke();
-  ctx.restore();
+  // hand-drawn arrow pointing at the start (hidden after first interaction)
+  if (!s.interacted) {
+    const p0 = ps[0];
+    const tipX = p0.x - yarnW / 2 - 4;
+    const tipY = p0.y;
+    const startX = tipX - 60;
+    const startY = tipY - 15;
+    ctx.save();
+    ctx.strokeStyle = "#1e1b2e";
+    ctx.lineWidth = 2.2;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    ctx.moveTo(startX, startY);
+    ctx.bezierCurveTo(
+      startX + 20,
+      startY + 14,
+      tipX - 22,
+      tipY - 4,
+      tipX,
+      tipY
+    );
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(tipX - 9, tipY - 7);
+    ctx.lineTo(tipX + 1, tipY);
+    ctx.lineTo(tipX - 7, tipY + 8);
+    ctx.stroke();
+    ctx.restore();
+  }
 
   // attachment dots — darker purple, × only on hover
   for (const a of s.attach) {
@@ -498,6 +501,10 @@ export function YarnSpiral() {
       }
 
       const all = [...spts, ...trail];
+      // one-time subtle jitter at random intervals (10-20 segments apart)
+      for (let i = Math.floor(Math.random() * 11) + 5; i < all.length; i += Math.floor(Math.random() * 11) + 5) {
+        all[i].x += (Math.random() - 0.5) * 6;
+      }
       const ps: P[] = all.map((p) => ({
         x: p.x,
         y: p.y,
@@ -603,6 +610,7 @@ export function YarnSpiral() {
         texts,
         yarnW,
         font,
+        interacted: false,
       };
 
       function tick() {
@@ -640,6 +648,7 @@ export function YarnSpiral() {
   const down = useCallback((e: React.PointerEvent) => {
     const s = st.current;
     if (!s) return;
+    s.interacted = true;
     const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
     const x = e.clientX - r.left;
     const y = e.clientY - r.top;
