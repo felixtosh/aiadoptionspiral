@@ -481,8 +481,9 @@ export function YarnSpiral() {
 
       // trailing curve (bezier to right side, slightly below center)
       const last = spts[spts.length - 1] ?? { x: cx, y: cy };
-      const endX = w - 40;
-      const endY = cy + 30;
+      const edgePad = Math.max(12, Math.min(40, w * 0.04));
+      const endX = w - edgePad;
+      const endY = cy + Math.min(30, h * 0.04);
       const tdx = endX - last.x;
       const tdy = endY - last.y;
       const trailDist = Math.sqrt(tdx * tdx + tdy * tdy);
@@ -815,15 +816,15 @@ export function YarnSpiral() {
   return (
     <div
       ref={boxRef}
-      className={`${handFont.className} relative w-full h-screen overflow-hidden select-none`}
-      style={{ background: BG, cursor: "default" }}
+      className={`${handFont.className} fixed inset-0 overflow-hidden select-none`}
+      style={{ background: BG, cursor: "default", touchAction: "none", overscrollBehavior: "none" }}
       onPointerDown={down}
       onPointerMove={move}
       onPointerUp={up}
     >
-      <div className="absolute top-6 left-1/2 z-10 -translate-x-1/2 flex flex-col items-center gap-1">
+      <div className="absolute top-3 sm:top-6 left-1/2 z-10 -translate-x-1/2 flex flex-col items-center gap-0.5 sm:gap-1 text-center w-full px-3 sm:px-0 sm:w-auto">
         <h1
-          className="rounded-lg px-5 py-2 text-base font-bold tracking-[0.18em] text-white"
+          className="rounded-lg px-2.5 sm:px-5 py-1.5 sm:py-2 text-xs sm:text-base font-bold tracking-[0.08em] sm:tracking-[0.18em] text-white whitespace-nowrap"
           style={{ background: "#1e1b2e" }}
         >
           THE AI ADOPTION SPIRAL
@@ -832,7 +833,7 @@ export function YarnSpiral() {
           href="https://www.linkedin.com/in/liz-fosslien"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xl font-bold tracking-[0.18em] text-black hover:underline"
+          className="text-sm sm:text-xl font-bold tracking-[0.06em] sm:tracking-[0.18em] text-black hover:underline whitespace-nowrap"
           style={{ fontFamily: handFont.style.fontFamily }}
         >
           Inspired by Liz Fosslien
@@ -847,7 +848,7 @@ export function YarnSpiral() {
 
       <button
         onClick={copyText}
-        className="absolute bottom-5 left-5 z-10 rounded-md px-3 py-1.5 text-xs font-medium text-gray-600 backdrop-blur transition hover:bg-white/60"
+        className="absolute bottom-3 sm:bottom-5 left-3 sm:left-5 z-10 rounded-md px-3 py-1.5 text-xs font-medium text-gray-600 backdrop-blur transition hover:bg-white/60"
         style={{ background: "rgba(255,255,255,0.4)" }}
       >
         Copy text
